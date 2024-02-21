@@ -104,7 +104,6 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
     
     
     func setPremiumInfo() {
-        print("================")
         let nextVC = PremiumInfoViewController()
         nextVC.modalPresentationStyle = .pageSheet
         if let sheetPresentationController = nextVC.sheetPresentationController {
