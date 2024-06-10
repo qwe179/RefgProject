@@ -24,18 +24,6 @@ class RefrigratorView: UIView {
             setupUI()
         }
     }
-
-    var isSwitchOn = false {
-        willSet {
-            if newValue == true {
-                removeSubviews()
-                setupListUI()
-            } else {
-                removeSubviews()
-                setupUI()
-            }
-        }
-    }
     // MARK: - UI 셋팅
 
     lazy var dropDownButton: UIButton = {
@@ -251,14 +239,17 @@ class RefrigratorView: UIView {
     }
 
     func setComponentButtonLayout(button: UIButton, componentData: ComponentData) {
-        let coordinates = CGPoint.fromString(componentData.coordinates ?? "") ?? CGPoint(x: 0, y: 0)
         self.addSubview(button)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            button.centerXAnchor.constraint(equalTo: self.leadingAnchor, constant: coordinates.x),
-            button.centerYAnchor.constraint(equalTo: self.topAnchor, constant: coordinates.y),
-            button.heightAnchor.constraint(equalToConstant: 28)
-        ])
+        if let coordinates = CGPoint.fromString(componentData.coordinates ?? "") {
+            button.centerXAnchor.constraint(equalTo: self.leadingAnchor, constant: coordinates.x).isActive = true
+            button.centerYAnchor.constraint(equalTo: self.topAnchor, constant: coordinates.y).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        } else {
+            button.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+            button.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            return
+        }
     }
 
     func setupUI() {
