@@ -16,7 +16,6 @@ class ViewController: UIViewController {
     var label: String?
     var isFirst: Bool = true
 
-    // MARK: - 라이프사이클
     override func viewDidLoad() {
         super.viewDidLoad()
         IsPremium.isPremium = true
@@ -44,19 +43,15 @@ class ViewController: UIViewController {
     }
     // MARK: - 네비게이션 바
     func makeNavi() {
-
         let appearance = UINavigationBarAppearance()
-
-        // 배경 색상 설정
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
-        appearance.shadowColor = .white // 라인 없애기보다 배경색이랑 맞춰주는게 쉬은듯..
+        appearance.shadowColor = .white
         appearance.titleTextAttributes = [.font: UIFont.systemFont(ofSize: 10, weight: .bold)]
         navigationController?.navigationBar.tintColor = .black
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-
     }
     // MARK: - 콜렉션뷰 데이터, 델리게이트 셋팅
 
@@ -80,8 +75,7 @@ class ViewController: UIViewController {
     @objc func nextButtonTapped() {
         let nextVC = NicknameViewController()
         if let label = self.label {
-            nextVC.fridgeDescription = label
-            print(label)
+            nextVC.setFridgeDescription(label)
         } else {
             return
         }

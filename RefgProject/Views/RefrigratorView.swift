@@ -18,7 +18,7 @@ class RefrigratorView: UIView {
         return view
     }()
 
-    var test = "(상냉장 하냉동)" {
+    var fridgeName = "(상냉장 하냉동)" {
         didSet {
             removeSubviews()
             setupUI()
@@ -36,46 +36,18 @@ class RefrigratorView: UIView {
             }
         }
     }
-
-    // MARK: - 냉장고 및 내용물 정보
-
-//    var kindOfRef: RefData? {
-//
-//        didSet {
-//            //데이터 다시설정하는거 해야함
-//        }
-//    }
-
     // MARK: - UI 셋팅
 
-    lazy var button: UIButton = {
-        let button = UIButton()
-
+    lazy var dropDownButton: UIButton = {
+        let btn = UIButton()
         var title: String = "양문형3/4도어"
-//        if let name = kindOfRef?.name {
-//            title = name
-//        }
-
-        button.setTitle(title, for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitleColor(UIColor.black, for: .normal)
-        button.setImage(UIImage(named: "arrowdown.png"), for: .normal)
-        /* 버튼 이미지 오른쪽으로(스위프트 14이후에는 이렇게 사용)
-         그리고 폰트사이즈도 여기서 수정해줘야됨,, 우선적으로 적용되는듯
-         */
-        var newConfig = UIButton.Configuration.plain()
-        newConfig.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-           var outgoing = incoming
-           outgoing.font = UIFont(name: "NotoSansKR-Thin_Medium", size: 20)!
-            return outgoing
-        }
-        newConfig.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 2, bottom: 0, trailing: 0)
-        newConfig.imagePlacement = .trailing
-        newConfig.imagePadding = 8.0
-
-        button.configuration = newConfig
-
-        return button
+        btn.setTitle(title, for: .normal)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitleColor(UIColor.black, for: .normal)
+        btn.setImage(UIImage(named: "arrowdown.png"), for: .normal)
+        btn.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Medium", size: 20)!
+        btn.semanticContentAttribute = .forceRightToLeft
+        return btn
     }()
 
     let plusButton: UIButton = {
@@ -190,9 +162,9 @@ class RefrigratorView: UIView {
         dropDown.selectionAction = {  (index: Int, item: String) in
             print("Selected item: \(item) at index: \(index)")
         }
-        dropDown.bottomOffset = CGPoint(x: 0, y: button.bounds.height)
+        dropDown.bottomOffset = CGPoint(x: 0, y: dropDownButton.bounds.height)
         dropDown.dismissMode = .automatic // 팝업을 닫을 모드 설정
-        dropDown.anchorView = button
+        dropDown.anchorView = dropDownButton
         return dropDown
     }()
 
@@ -249,31 +221,24 @@ class RefrigratorView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    var ingredientButtons: [UIButton] = []
 
     // MARK: - 오토레이아웃
-    func createLabel(_ gesture: UIPanGestureRecognizer, _ componentData: ComponentData) -> UIButton {
-        let label: UIButton = {
-            let btn = UIButton()
-            btn.translatesAutoresizingMaskIntoConstraints = false
-            btn.setTitle(componentData.name, for: .normal)
-            var buttonConfig = UIButton.Configuration.plain()
-            buttonConfig.titlePadding = 4
-            buttonConfig.baseForegroundColor = UIColor.white
-            buttonConfig.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-               var outgoing = incoming
-               outgoing.font = UIFont(name: "NotoSansKR-Thin_Medium", size: 12)!
-                return outgoing
-            }
-            btn.configuration = buttonConfig
-            btn.backgroundColor = UIColor(hexString: componentData.tagColor ?? "FF5D47")
-         //   v.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 12)
-            btn.layer.cornerRadius = 5
-            btn.layer.masksToBounds = true
-            return btn
-        }()
-        label.isUserInteractionEnabled = true
-        label.addGestureRecognizer(gesture)
-        return label
+    func createComponentButton(_ gesture: UIPanGestureRecognizer, _ componentData: ComponentData, _ index: Int) -> UIButton {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle(componentData.name, for: .normal)
+        button.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Medium", size: 12)!
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+        button.backgroundColor = UIColor(hexString: componentData.tagColor ?? "FF5D47")
+        button.layer.cornerRadius = 5
+        button.layer.masksToBounds = true
+        button.isUserInteractionEnabled = true
+        button.addGestureRecognizer(gesture)
+        button.tag = index
+        ingredientButtons.append(button)
+        return button
     }
 
     func setupConstraintsOfLabels(_ labels: [UIView]) {
@@ -283,6 +248,17 @@ class RefrigratorView: UIView {
             label.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
             label.heightAnchor.constraint(equalToConstant: 28).isActive = true
         }
+    }
+
+    func setComponentButtonLayout(button: UIButton, componentData: ComponentData) {
+        let coordinates = CGPoint.fromString(componentData.coordinates ?? "") ?? CGPoint(x: 0, y: 0)
+        self.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.centerXAnchor.constraint(equalTo: self.leadingAnchor, constant: coordinates.x),
+            button.centerYAnchor.constraint(equalTo: self.topAnchor, constant: coordinates.y),
+            button.heightAnchor.constraint(equalToConstant: 28)
+        ])
     }
 
     func setupUI() {
@@ -303,7 +279,7 @@ class RefrigratorView: UIView {
             switchLabel.centerYAnchor.constraint(equalTo: switchStackView.centerYAnchor)
         ])
 
-        switch test {
+        switch fridgeName {
         case "(상냉장 하냉동)":
             refStackView.axis = .horizontal
             refStackView.addArrangedSubview(refViews[0])
@@ -320,7 +296,6 @@ class RefrigratorView: UIView {
                 refStackView3.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -58)
 
             ])
-            print("something1")
         case "(좌냉동 우냉장)":
             refStackView.axis = .horizontal
             refStackView.addArrangedSubview(refViews[0])

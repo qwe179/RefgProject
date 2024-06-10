@@ -10,7 +10,6 @@ import DLRadioButton
 import GoogleMobileAds
 
 class AddComponentsViewController: UIViewController {
-    // MARK: - 뷰에 아무것도 설정안해주면 화면넘어갈때 버벅임
     let addComponentsView = AddComponentsView()
     let myColor = UIColor.getCustomColor()
     let coreDataManager = CoreDataManager.shared
@@ -84,9 +83,6 @@ class AddComponentsViewController: UIViewController {
         guard let registerDay = addComponentsView.registerDateTextField.text else { return nil}
         guard let dueDay = addComponentsView.expirationDateTextField.text else { return nil}
         guard let memo = addComponentsView.memoTextField.text else { return nil}
-//        guard let tagColor = self.tagColor else {
-//
-//            return nil}
         let tagColor = self.tagColor ?? "black"
 
         return Component(

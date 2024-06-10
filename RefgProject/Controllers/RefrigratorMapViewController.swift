@@ -11,66 +11,53 @@ import GoogleMobileAds
 
 final class RefrigratorMapViewController: UIViewController, UISheetPresentationControllerDelegate {
 
-    var buttonBackup: UIButton?
-    var backgroundColorBackup: UIColor?
-
+    private var buttonBackup: UIButton?
+    private var tmpIngredientButtonColor: UIColor?
     private let refrigratorView = RefrigratorView()
-    let componentDetailView = ComponentDetailView()
+    private let componentDetailView = ComponentDetailView()
     private let coreDataManager = CoreDataManager.shared
-    var currentFridgeData: RefrigeratorData? {
-        didSet {
-            if let name = self.currentFridgeData?.refName {
-                print("currentFridgeData:", name)
-            } else {
-                print("currentFridgeData:nil")
-            }
-        }
-    }
-    var currentComponentData: ComponentData?
-    var buttons: [UIButton] = []
-    var removeComponentsList: [ComponentData] = []
-    var changedCell: [ComponentsTableViewCell] = []
-    var sortType: String?
-
-    var demoAdmobView: GADBannerView = { // admob 부분
-        var view = GADBannerView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-
+    private var fridgesData: [RefrigeratorData] = []
+    private var currentFridgeData: RefrigeratorData?
+    private var shouldRemoveComponentsList: [ComponentData] = []
+    private var sortType: String?
     // MARK: - 라이프사이클
+    func setFridgeData() {
+        fridgesData = coreDataManager.getFridgeDataFromCoreData()
+        currentFridgeData = fridgesData[0]
+    }
+
+    func setTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
+        view.addGestureRecognizer(tapGesture)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let fridgeDatas = coreDataManager.getFridgeDataFromCoreData()
-        currentFridgeData = fridgeDatas[0]
-
-        setDropDownDatas()
-        self.view = refrigratorView
+        view = refrigratorView
+        setFridgeData()
         makeNavi()
         setTargets()
         setupTableView()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        // 제스쳐 다른뷰에도 인식가능하도록..
-        tapGesture.cancelsTouchesInView = false
-        tapGesture.delegate = self
-
-        self.view.addGestureRecognizer(tapGesture)
-
+        setTapGesture()
         setupBannerView()
-
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setDropDownDatas()
+
+        for cell in refrigratorView.tableView.visibleCells {
+            cell.contentView.backgroundColor = .clear
+        }
+        setDropDownData()
         if let refType = currentFridgeData?.refType {
-            refrigratorView.test = refType
+            refrigratorView.fridgeName = refType
         }
-        buttons.forEach { view in
-            view.removeFromSuperview()
-        }
-        buttons = []
+        refrigratorView.ingredientButtons.forEach { view in
+             view.removeFromSuperview()
+         }
+        refrigratorView.ingredientButtons = []
         // 데이터 다시 가져오기
         if !refrigratorView.switchList.isOn {
             // 리스트 스위치 온이면 재료뷰 셋팅안함
@@ -79,28 +66,19 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
             refrigratorView.removeSubviews()
             refrigratorView.setupListUI()
         }
-        // 화면 새로로드
         refrigratorView.tableView.reloadData()
-        self.view.setNeedsLayout()
-        self.view.setNeedsDisplay()
-
+        reloadViewLayout(view)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        // MARK: - 사라질때 탭바 숨기는거 취소
         hidesBottomBarWhenPushed = false
     }
 
     // MARK: - 네비게이션
-
     func makeNavi() {
-
         let appearance = UINavigationBarAppearance()
-
-        // 네비게이션 바 왼쪽에 버튼 추가
-        // 왼쪽 및 오른쪽 아이템의 폰트 크기 설정
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: refrigratorView.button)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: refrigratorView.dropDownButton)
         if  IsPremium.isPremium == true {
             navigationItem.rightBarButtonItems = [
                 UIBarButtonItem(customView: refrigratorView.listButton),
@@ -113,7 +91,6 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
         appearance.shadowColor = .white // 라인 없애기보다 배경색이랑 맞춰주는게 쉬은듯..
-        // appearance.titleTextAttributes = [.font: UIFont.systemFont(ofSize: 10, weight: .bold)]
         appearance.titleTextAttributes = [.font: UIFont.systemFont(ofSize: 5)]
 
         // 다른 속성 설정
@@ -129,26 +106,23 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
     }
 
     // MARK: - 냉장고 닉네임
-    func setDropDownDatas() {
-        let fridgeDatas = coreDataManager.getFridgeDataFromCoreData()
-        let nickNames = fridgeDatas.map { $0.refName! }
-
-        refrigratorView.dropDown.dataSource = nickNames
-        refrigratorView.button.setTitle(currentFridgeData?.refName, for: .normal)
-
+    func setDropDownData() {
+        let fridgeNickNames = fridgesData.map { $0.refName! }
+        refrigratorView.dropDown.dataSource = fridgeNickNames
+        refrigratorView.dropDownButton.setTitle(currentFridgeData?.refName, for: .normal)
         refrigratorView.dropDown.selectionAction = { [weak self] (index: Int, item: String) in
             guard let self = self else { return }
-            refrigratorView.button.setTitle(item, for: .normal)
+            refrigratorView.dropDownButton.setTitle(item, for: .normal)
             // 선택된 아이템의 인덱스로  데이터를 가져오기
-            currentFridgeData = fridgeDatas[index]
-            if let refType = currentFridgeData?.refType {
-                refrigratorView.test = refType
+            currentFridgeData = fridgesData[index]
+            if let fridgeType = currentFridgeData?.refType {
+                refrigratorView.fridgeName = fridgeType
             }
             // 기존 재료들 초기화
-            buttons.forEach { view in
-                view.removeFromSuperview()
-            }
-            buttons = []
+            refrigratorView.ingredientButtons.forEach { view in
+                 view.removeFromSuperview()
+             }
+            refrigratorView.ingredientButtons = []
             // 데이터 다시 가져오기
             if !refrigratorView.switchList.isOn {
                 setComponentOfFridge()
@@ -158,53 +132,39 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
                 refrigratorView.tableView.reloadData()
             }
             // 삭제할 재료들 초기화(테이블뷰)
-            removeComponentsList = []
-            changedCell.forEach { cell in
-                cell.contentView.backgroundColor = .clear
-            }
-            changedCell = []
+            shouldRemoveComponentsList = []
             // 화면 새로로드
-            self.view.setNeedsLayout()
-            self.view.setNeedsDisplay()
-
+            reloadViewLayout(view)
         }
-
     }
 
     func setComponentOfFridge() {
         let components = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
         components.enumerated().forEach { (index, componentData) in
             let gesture = UIPanGestureRecognizer(target: self, action: #selector(draggingView))
-            let button = refrigratorView.createLabel(gesture, componentData)
-            button.tag = index
-            buttons.append(button)
-            // MARK: - 재료 버튼 타겟
-            button.addTarget(self, action: #selector(componentButtonTapped), for: .touchUpInside)
-            if componentData.coordinates == "" {
-                self.view.addSubview(button)
-                button.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-                button.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-                button.heightAnchor.constraint(equalToConstant: 28).isActive = true
-            } else {
-                // 여기 실제 좌표 써야함..
-                guard let coordinates = CGPoint.fromString(componentData.coordinates!) else { return }
-                self.view.addSubview(button)
-                button.centerXAnchor.constraint(
-                    equalTo: self.view.leadingAnchor,
-                    constant: coordinates.x
-                ).isActive = true
-                button.centerYAnchor.constraint(
-                    equalTo: self.view.topAnchor,
-                    constant: coordinates.y
-                ).isActive = true
-                button.heightAnchor.constraint(equalToConstant: 28).isActive = true
-            }
+            let button = refrigratorView.createComponentButton(gesture, componentData, index)
+            setComponentButtonLayout(button: button, componentData: componentData)
         }
     }
 
+    func setComponentButtonLayout(button: UIButton, componentData: ComponentData) {
+        button.addTarget(self, action: #selector(componentButtonTapped), for: .touchUpInside)
+        guard let coordinates = CGPoint.fromString(componentData.coordinates ?? "") else {
+            self.view.addSubview(button)
+            button.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+            button.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            return
+        }
+        self.view.addSubview(button)
+        button.centerXAnchor.constraint(equalTo: self.view.leadingAnchor, constant: coordinates.x).isActive = true
+        button.centerYAnchor.constraint(equalTo: self.view.topAnchor, constant: coordinates.y).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+    }
+
     func setTargets() {
-        refrigratorView.button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        refrigratorView.switchList.addTarget(self, action: #selector(switchValueTapped(_: )), for: .valueChanged)
+        refrigratorView.dropDownButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        refrigratorView.switchList.addTarget(self, action: #selector(switchListTapped(_: )), for: .valueChanged)
         refrigratorView.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         refrigratorView.listButton.addTarget(self, action: #selector(listButtonTapped), for: .touchUpInside)
         refrigratorView.addListButton.addTarget(self, action: #selector(addListButtonTapped), for: .touchUpInside)
@@ -217,10 +177,8 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
     func setupTableView() {
         refrigratorView.tableView.dataSource = self
         refrigratorView.tableView.delegate = self
-        // 셀의 등록과정⭐️⭐️⭐️ (스토리보드 사용시에는 스토리보드에서 자동등록)
         refrigratorView.tableView.register(ComponentsTableViewCell.self, forCellReuseIdentifier: "ComponentCell")
     }
-    // MARK: - 버튼, 스위치 이벤트
     // 재료 태그 드래그 할 시 이벤트
     @objc func draggingView(_ sender: UIPanGestureRecognizer) {
         let point = sender.location(in: view)
@@ -230,39 +188,17 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
         // 제스쳐 상태 처리 코드
         switch sender.state {
         case .began:
-            // 드래그 시작
-            // 필요한 초기화 작업을 수행할 수 있습니다.
             componentDetailView.isHidden = true
         case .changed:
-            // 드래그 중
+            if point.y > safeAreaHeight.y + 50 {
+                draggedView.center = point
+            }
+        case .ended:
             if point.y > safeAreaHeight.y + 50 {
                 draggedView.center = point
             } else {
-                sender.isEnabled = false
-                sender.isEnabled = true
-                let components = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
                 finalPoint.y = safeAreaHeight.y + 49
-                components[draggedView.tag].coordinates = finalPoint.toString()
-                guard let refID = currentFridgeData?.refID else { return }
-                guard let id = components[draggedView.tag].id else { return }
-                guard let coordinates = components[draggedView.tag].coordinates else { return }
-                self.coreDataManager.updateCoordinatesOfComponents(
-                    refID: refID,
-                    id: id,
-                    coordinates: coordinates,
-                    completion: { }
-                )
-                buttons.forEach { view in
-                    view.removeFromSuperview()
-                }
-                buttons = []
-                setComponentOfFridge()
-                componentDetailView.isHidden = true
-                return
             }
-        case .ended:
-            // 드래그 종료
-            // 여기다가 현재 재료 위치 셋팅하는 코드 넣어야함
             let components = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
             components[draggedView.tag].coordinates = finalPoint.toString()
             guard let refID = currentFridgeData?.refID else { return }
@@ -274,12 +210,11 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
                 coordinates: coordinates,
                 completion: {}
             )
-            buttons.forEach { view in
+            refrigratorView.ingredientButtons.forEach { view in
                 view.removeFromSuperview()
             }
-            buttons = []
+            refrigratorView.ingredientButtons = []
             setComponentOfFridge()
-            componentDetailView.isHidden = true
         default:
             break
         }
@@ -289,36 +224,22 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
         refrigratorView.dropDown.show()
     }
 
-    @objc func switchValueTapped(_ sender: UISwitch) {
-        print("스위치 토글")
-        switch sender.isOn {
-        case true:
-            refrigratorView.isSwitchOn = true
-            buttons.forEach { view in
-                view.removeFromSuperview()
-            }
-            buttons = []
-
-            self.view.setNeedsLayout()
-            self.view.setNeedsDisplay()
-            refrigratorView.tableView.reloadData()
-
-        case false:
-            refrigratorView.isSwitchOn = false
-            buttons.forEach { view in
-                view.removeFromSuperview()
-            }
-            buttons = []
-            setComponentOfFridge() // 스위치 꺼지면 재료뷰 셋팅해야함
-            self.view.setNeedsLayout()
-            self.view.setNeedsDisplay()
+    @objc func switchListTapped(_ sender: UISwitch) {
+        refrigratorView.isSwitchOn = sender.isOn
+        refrigratorView.ingredientButtons.forEach { view in
+            view.removeFromSuperview()
         }
-
+        refrigratorView.ingredientButtons = []
+        if sender.isOn {
+            refrigratorView.tableView.reloadData()
+        } else {
+            setComponentOfFridge() // 스위치 꺼지면 재료뷰 셋팅해야함
+        }
+        reloadViewLayout(view)
     }
     // MARK: - 냉장고 추가 버튼
 
     @objc func plusButtonTapped(_ sender: UISwitch) {
-        print("플러스 버튼 탭드")
         let nextVC = RefrigeratorAddViewController()
         nextVC.delegate = self
         hidesBottomBarWhenPushed = true
@@ -328,7 +249,6 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
 
     @objc func listButtonTapped(_ sender: UISwitch) {
         let nextVC = RefrigeratorEditViewController()
-
         nextVC.delegate = self
         nextVC.currentFridgeData = self.currentFridgeData // 현재 냉장고 데이터 전달
         nextVC.refrigeratorEditView.nickNameTextField.text = self.currentFridgeData?.refName
@@ -349,12 +269,12 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
 
     // MARK: - 재료 클릭 이벤트
     @objc func componentButtonTapped(_ sender: UIButton) {
-        buttonBackup = sender
-        backgroundColorBackup = sender.backgroundColor
-        sender.backgroundColor = UIColor.getCustomColor() // 재료 버튼 색깔 초록색으로 표시
-        let data = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
         componentDetailView.removeFromSuperview()
         self.view.addSubview(componentDetailView)
+        buttonBackup = sender
+        tmpIngredientButtonColor = sender.backgroundColor
+        sender.backgroundColor = UIColor.getCustomColor() // 재료 버튼 색깔 초록색으로 표시
+        let data = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
         componentDetailView.registerDateLabel.text = DateHelper().dateToStringFormat(date: data[sender.tag].registerDay)
         componentDetailView.expireDateLabel.text = DateHelper().dateToStringFormat(date: data[sender.tag].dueDay)
         componentDetailView.memoContentLabel.text = data[sender.tag].memo
@@ -367,8 +287,12 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
             constant: 10
         ).isActive = true
         componentDetailView.isHidden = false
-        componentDetailView.setNeedsLayout()
-        componentDetailView.setNeedsDisplay()
+        reloadViewLayout(componentDetailView)
+    }
+
+    func reloadViewLayout(_ view: UIView) {
+        view.setNeedsLayout()
+        view.setNeedsDisplay()
     }
 
     // MARK: - 터치이벤트
@@ -376,40 +300,35 @@ final class RefrigratorMapViewController: UIViewController, UISheetPresentationC
     @objc func handleTap(_ gesture: UITapGestureRecognizer) {
         // 특정 뷰에서 터치 이벤트가 발생했을 때의 처리
         componentDetailView.isHidden = true
-        guard let button = buttonBackup else { return }
-        button.backgroundColor = backgroundColorBackup
+        //재료 버튼 색깔
+        guard let ingredientbutton = buttonBackup else { return }
+        ingredientbutton.backgroundColor = tmpIngredientButtonColor
     }
 
     @objc func deleteButtonTapped(_ sender: UIButton) {
         let data = coreDataManager.getComponentsFromCoreData(currentFridgeData?.refID, nil)
             coreDataManager.deleteComponentsByID(id: data[sender.tag].id!, completion: { })
         componentDetailView.isHidden = true
-     //   buttons[sender.tag].removeFromSuperview()
-        buttons.forEach { view in
+        refrigratorView.ingredientButtons.forEach { view in
             view.removeFromSuperview()
         }
-        buttons = []
+        refrigratorView.ingredientButtons = []
         setComponentOfFridge()
-        self.view.setNeedsLayout()
-        self.view.setNeedsDisplay()
-
+        reloadViewLayout(view)
     }
 
     @objc func sortDeleteButtonTapped(_ sender: UIButton) {
-        for component in removeComponentsList {
+        for component in shouldRemoveComponentsList {
             if let id = component.id {
                 coreDataManager.deleteComponentsByID(id: id, completion: { })
             }
             // 삭제할 재료들 초기화(테이블뷰)
-            removeComponentsList = []
-            changedCell.forEach { cell in
+            shouldRemoveComponentsList = []
+            for cell in  refrigratorView.tableView.visibleCells {
                 cell.contentView.backgroundColor = .clear
             }
-            changedCell = []
         }
-
         refrigratorView.tableView.reloadData()
-
     }
 
     @objc func sortButtonTapped(_ sender: UIButton) {
@@ -455,7 +374,6 @@ extension RefrigratorMapViewController: ComponentDelegate, UIGestureRecognizerDe
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         return !self.componentDetailView.bounds.contains(touch.location(in: self.componentDetailView))
-
     }
 }
 
@@ -501,13 +419,11 @@ extension RefrigratorMapViewController: UITableViewDataSource, UITableViewDelega
             if cell.contentView.backgroundColor == UIColor(hexString: "E5FDF0") {
                 cell.contentView.backgroundColor = .white
                 // 재료 삭제 취소
-                removeComponentsList = removeComponentsList.filter { $0 != cell.componentsData! }
+                shouldRemoveComponentsList.removeAll { $0 == cell.componentsData! }
             } else {
-                // 검정색이 아니면 선택 시 검정색으로 변경
                 cell.contentView.backgroundColor = UIColor(hexString: "E5FDF0")
                 // 삭제할 재료 추가
-                removeComponentsList.append(cell.componentsData!)
-                changedCell.append(cell)
+                shouldRemoveComponentsList.append(cell.componentsData!)
             }
         }
     }
@@ -524,7 +440,6 @@ extension RefrigratorMapViewController: ModalPopUpDelegate {
             } else {
                 self.refrigratorView.sortButton.setTitle("식재료 이름(ㄱ-ㅎ)", for: .normal)
             }
-
         } else {
             self.refrigratorView.sortButton.setTitle("최근 등록 순", for: .normal)
         }
@@ -544,6 +459,5 @@ extension RefrigratorMapViewController: GADBannerViewDelegate {
         refrigratorView.bannerView.rootViewController = self
         refrigratorView.bannerView.load(GADRequest())
         refrigratorView.bannerView.delegate = self
-
     }
 }
