@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 extension RefrigeratorData {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<RefrigeratorData> {
@@ -23,6 +22,6 @@ extension RefrigeratorData {
 
 }
 
-extension RefrigeratorData : Identifiable {
+extension RefrigeratorData: Identifiable {
 
 }

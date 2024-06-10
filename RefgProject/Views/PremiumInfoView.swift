@@ -8,7 +8,7 @@
 import UIKit
 
 class PremiumInfoView: UIView {
-    
+
     let mainLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -17,7 +17,7 @@ class PremiumInfoView: UIView {
         label.textColor = .black
         return label
     }()
-    
+
     let descriptionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,8 +32,6 @@ class PremiumInfoView: UIView {
         label.textColor = .black
         return label
     }()
-    
-
     // MARK: - 광고제거 버튼
 
     let removeOnlyAdButton: UIButton = {
@@ -44,8 +42,6 @@ class PremiumInfoView: UIView {
         button.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 20
-        
-        
         let originalTitle = "광고만제거- 월 결제                                   ₩900"
 
         // NSMutableAttributedString 생성
@@ -61,17 +57,15 @@ class PremiumInfoView: UIView {
           button.setAttributedTitle(attributedString, for: .normal)
         return button
     }()
-    
-    let PremiumButton: UIButton = {
+
+    let premiumButton: UIButton = {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor(red: 0.23, green: 0.70, blue: 0.46, alpha: 1.0)
-
-        //button.setTitle("광고만제거+냉장고 추가 - 월 결제                 1200₩", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 20
-        
+
         let originalTitle = "유료버전결제 - 월 결제                                      ₩1,200"
         // NSMutableAttributedString 생성
           let attributedString = NSMutableAttributedString(string: originalTitle)
@@ -86,21 +80,19 @@ class PremiumInfoView: UIView {
           button.setAttributedTitle(attributedString, for: .normal)
         return button
     }()
-    
+
     lazy var buttonStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        sv.axis = .vertical
-        sv.alignment = .fill
-        sv.spacing = 20
-        sv.distribution = .fillEqually
-      //  sv.addArrangedSubview(removeOnlyAdButton)
-        sv.addArrangedSubview(PremiumButton)
-        return sv
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = 20
+        stackView.distribution = .fillEqually
+      //  stackView.addArrangedSubview(removeOnlyAdButton)
+        stackView.addArrangedSubview(premiumButton)
+        return stackView
     }()
-    
-    
-    
+
     let bilLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -119,26 +111,26 @@ class PremiumInfoView: UIView {
         label.textColor = .gray
         return label
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
         setupUI()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setupUI() {
-        
+
         self.addSubview(mainLabel)
         NSLayoutConstraint.activate([
-            mainLabel.topAnchor.constraint(equalTo: self.topAnchor,constant: 21),
+            mainLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 21),
             mainLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             mainLabel.heightAnchor.constraint(equalToConstant: 60)
         ])
-        
+
         self.addSubview(descriptionLabel)
         NSLayoutConstraint.activate([
             descriptionLabel.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: 40),
@@ -146,34 +138,31 @@ class PremiumInfoView: UIView {
             descriptionLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -24),
             descriptionLabel.heightAnchor.constraint(equalToConstant: 90)
         ])
-        
+
         self.addSubview(buttonStackView)
-        
+
         NSLayoutConstraint.activate([
-            buttonStackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor,constant: 20),
+            buttonStackView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
             buttonStackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             buttonStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -24),
             buttonStackView.heightAnchor.constraint(equalToConstant: 48)
         ])
-        
+
         self.addSubview(bilLabel)
         NSLayoutConstraint.activate([
-            bilLabel.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor,constant: 20),
+            bilLabel.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 20),
             bilLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             bilLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -24)
         ])
     }
-    
-    func settingView(_ v: UIView) {
-        v.backgroundColor = .white
-        v.addSubview(self)
-        self.topAnchor.constraint(equalTo: v.topAnchor).isActive = true
-        self.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
-        self.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
-        self.trailingAnchor.constraint(equalTo: v.trailingAnchor).isActive = true
+
+    func settingView(_ view: UIView) {
+        view.backgroundColor = .white
+        view.addSubview(self)
+        self.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        self.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        self.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        self.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         self.translatesAutoresizingMaskIntoConstraints = false
     }
-    
-    
-
 }

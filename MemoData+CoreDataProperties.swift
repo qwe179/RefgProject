@@ -9,8 +9,7 @@
 import Foundation
 import CoreData
 
-
-extension MemoData {
+extension MemoData: Identifiable {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<MemoData> {
         return NSFetchRequest<MemoData>(entityName: "MemoData")
@@ -20,9 +19,5 @@ extension MemoData {
     @NSManaged public var id: UUID?
     @NSManaged public var isEdit: Bool
     @NSManaged public var memo: String?
-
-}
-
-extension MemoData : Identifiable {
 
 }

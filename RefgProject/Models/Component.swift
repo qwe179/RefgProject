@@ -8,9 +8,8 @@
 import Foundation
 protocol ComponentDelegate: AnyObject {
     func addNewComponent(_ component: Component)
-    func DeleteComponent(index: Int, _ component: Component)
+    func deleteComponent(index: Int, _ component: Component)
 }
-
 
 struct Component {
     var refID: String

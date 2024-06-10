@@ -47,7 +47,6 @@
 		6CBB21322B7492D40004EA32 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB21312B7492D40004EA32 /* Settings.swift */; };
 		6CBB21342B749CAF0004EA32 /* PremiumInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB21332B749CAF0004EA32 /* PremiumInfoViewController.swift */; };
 		6CBB21362B749FEE0004EA32 /* PremiumInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB21352B749FEE0004EA32 /* PremiumInfoView.swift */; };
-		6CBB213B2B7C56250004EA32 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 6CBB213A2B7C56250004EA32 /* GoogleMobileAds */; };
 		6CBB213D2B7C9DCF0004EA32 /* IsPremium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB213C2B7C9DCF0004EA32 /* IsPremium.swift */; };
 		6CEDA2442B5F6E4000BB5702 /* AddComponentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CEDA2432B5F6E4000BB5702 /* AddComponentsViewController.swift */; };
 		6CEDA2462B5F7EE600BB5702 /* AddComponentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CEDA2452B5F7EE600BB5702 /* AddComponentsView.swift */; };
@@ -150,7 +149,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6C9172C32B85A563005B8E78 /* StoreKit.framework in Frameworks */,
-				6CBB213B2B7C56250004EA32 /* GoogleMobileAds in Frameworks */,
 				B4CCE13EB9000385451AAC52 /* Pods_RefgProject.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,19 +326,17 @@
 			buildConfigurationList = 6CF2E72D2B59192A00969705 /* Build configuration list for PBXNativeTarget "RefgProject" */;
 			buildPhases = (
 				D8FD22EBA2AFE6AE5773777B /* [CP] Check Pods Manifest.lock */,
+				6C3BC6352C12F2B2009791EA /* SwiftLint Script */,
 				6CF2E7122B59192900969705 /* Sources */,
 				6CF2E7132B59192900969705 /* Frameworks */,
 				6CF2E7142B59192900969705 /* Resources */,
-				37FAA522EB5AC0A2802229CE /* [CP] Embed Pods Frameworks */,
+				CD94A062D32654681FE45777 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = RefgProject;
-			packageProductDependencies = (
-				6CBB213A2B7C56250004EA32 /* GoogleMobileAds */,
-			);
 			productName = RefgProject;
 			productReference = 6CF2E7162B59192900969705 /* RefgProject.app */;
 			productType = "com.apple.product-type.application";
@@ -398,7 +394,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		37FAA522EB5AC0A2802229CE /* [CP] Embed Pods Frameworks */ = {
+		6C3BC6352C12F2B2009791EA /* SwiftLint Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "SwiftLint Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [[ \"$(uname -m)\" == arm64 ]]\nthen\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif command -v swiftlint >/dev/null 2>&1\nthen\n    swiftlint\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+		CD94A062D32654681FE45777 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -736,14 +750,6 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		6CBB213A2B7C56250004EA32 /* GoogleMobileAds */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6CBB21392B7C56250004EA32 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
-			productName = GoogleMobileAds;
-		};
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		6CF2E7222B59192900969705 /* RefgProject.xcdatamodeld */ = {

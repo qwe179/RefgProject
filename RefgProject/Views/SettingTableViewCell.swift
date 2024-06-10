@@ -8,7 +8,7 @@
 import UIKit
 
 class SettingTableViewCell: UITableViewCell {
-    
+
 //    let button: UIButton = {
 //        let btn = UIButton()
 //        btn.translatesAutoresizingMaskIntoConstraints = false
@@ -17,13 +17,13 @@ class SettingTableViewCell: UITableViewCell {
 //        btn.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 14)
 //        return btn
 //    }()
-    
+
     var settings: Settings? {
         willSet {
             label.text = newValue?.settingName
         }
     }
-    
+
     let label: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,26 +32,26 @@ class SettingTableViewCell: UITableViewCell {
         label.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 16)
         return label
     }()
-    
+
     lazy var  stackView: UIStackView = {
-        let sv = UIStackView()
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        sv.axis = .vertical
-        sv.alignment = .fill
-        sv.distribution = .fill
-        sv.addArrangedSubview(label)
-        return sv
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        stackView.addArrangedSubview(label)
+        return stackView
     }()
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?){
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         setConstraints()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func setConstraints() {
         self.contentView.addSubview(stackView)
         NSLayoutConstraint.activate([
@@ -61,16 +61,4 @@ class SettingTableViewCell: UITableViewCell {
             stackView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -10)
         ])
     }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

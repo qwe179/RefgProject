@@ -8,8 +8,6 @@
 import UIKit
 
 final class JasonCodingHelper {
-
-    
     // 데이터를 Data로 인코딩하는 함수
     static func encodeData<T: Codable>(_ value: T) -> Data? {
         let encoder = JSONEncoder()
@@ -31,7 +29,4 @@ final class JasonCodingHelper {
             return nil
         }
     }
-    
-    
-    
 }

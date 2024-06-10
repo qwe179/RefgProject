@@ -9,23 +9,23 @@ import UIKit
 import StoreKit
 
 class PremiumInfoViewController: UIViewController {
-    
+
     let premiumInfoView = PremiumInfoView()
     private var products = [SKProduct]()
     private let productOrder: [String] = [
         MyProducts.productID
     ]
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         settingView()
         loadProductsInfo()
     }
-    
+
     func settingView() {
         premiumInfoView.settingView(self.view)
         sheetPresentationController?.preferredCornerRadius = 30
-        premiumInfoView.PremiumButton.addTarget(self, action: #selector(premiumButtonTapped), for: .touchUpInside)
+        premiumInfoView.premiumButton.addTarget(self, action: #selector(premiumButtonTapped), for: .touchUpInside)
     }
     func loadProductsInfo() {
         MyProducts.iapService.getProducts { [weak self] success, products in
@@ -33,16 +33,13 @@ class PremiumInfoViewController: UIViewController {
           guard let ss = self else { return }
           if success, let products = products {
             DispatchQueue.main.async {
-                //ss.products
                 print("성공")
             }
           }
         }
     }
-    
+
     @objc func premiumButtonTapped() {
-        //SKStoreProductViewController()
-        print("product :",self.products)
         guard let product = self.products.first else { return }
         MyProducts.iapService.buyProduct(product)
     }

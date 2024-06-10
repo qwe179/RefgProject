@@ -8,5 +8,5 @@
 import Foundation
 
 struct IsPremium {
-    static var isPremium:Bool = false
+    static var isPremium: Bool = false
 }

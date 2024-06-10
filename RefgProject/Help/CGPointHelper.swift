@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension CGPoint {
     // CGPoint를 문자열로 변환
     func toString() -> String {

@@ -7,14 +7,14 @@
 
 import UIKit
 import CoreData
-import GoogleMobileAds //얘도 임포트해줘야함
+import GoogleMobileAds
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         sleep(2)
-        
+
         // 구글 광고 초기화 -> 모바일 광고 SDK 초기화해줘야함. 이 작업은 한 번만 수행하면 됨 (최대한 빨리 호출하는게 좋다)
         DispatchQueue.global().async {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -48,11 +48,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          error conditions that could cause the creation of the store to fail.
         */
         let container = NSPersistentContainer(name: "RefgProject")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                 
+
                 /*
                  Typical reasons for an error here include:
                  * The parent directory does not exist, cannot be created, or disallows writing.
@@ -84,4 +84,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
-

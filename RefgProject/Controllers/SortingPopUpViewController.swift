@@ -8,17 +8,17 @@
 import UIKit
 
 class SortingPopUpViewController: UIViewController {
-    
+
     weak var delegate: ModalPopUpDelegate?
     var sortingType: String?
-    
+
     let registerSortingButton: UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("최근 등록 순", for: .normal)
         btn.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 16)
         btn.setTitleColor(.black, for: .normal)
-        btn.contentHorizontalAlignment = .left //버튼 왼쪽정렬
+        btn.contentHorizontalAlignment = .left
         btn.backgroundColor = .white
         return btn
     }()
@@ -28,32 +28,32 @@ class SortingPopUpViewController: UIViewController {
         btn.setTitle("소비기한 적게 남은 순", for: .normal)
         btn.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 16)
         btn.setTitleColor(.black, for: .normal)
-        btn.contentHorizontalAlignment = .left //버튼 왼쪽정렬
+        btn.contentHorizontalAlignment = .left
         btn.backgroundColor = .white
         return btn
     }()
-    //NotoSansKR-Thin_Regular
+
     let nameSortingButton: UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("식재료 이름(ㄱ-ㅎ)", for: .normal)
         btn.titleLabel?.font = UIFont(name: "NotoSansKR-Thin_Regular", size: 16)
         btn.setTitleColor(.black, for: .normal)
-        btn.contentHorizontalAlignment = .left //버튼 왼쪽정렬
+        btn.contentHorizontalAlignment = .left
         btn.backgroundColor = .white
         return btn
     }()
-    lazy var stackView:UIStackView = {
-        let sv = UIStackView()
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        sv.axis = .vertical
-        sv.distribution = .fillEqually
-        sv.alignment = .fill
-        sv.addArrangedSubview(registerSortingButton)
-        sv.addArrangedSubview(expireSortingButton)
-        sv.addArrangedSubview(nameSortingButton)
-        sv.backgroundColor = .white
-        return sv
+    lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
+        stackView.alignment = .fill
+        stackView.addArrangedSubview(registerSortingButton)
+        stackView.addArrangedSubview(expireSortingButton)
+        stackView.addArrangedSubview(nameSortingButton)
+        stackView.backgroundColor = .white
+        return stackView
     }()
 
     override func viewDidLoad() {
@@ -62,7 +62,7 @@ class SortingPopUpViewController: UIViewController {
         addTargets()
         setButtonText()
     }
-    
+
     func setButtonText() {
         if let sortType = self.sortingType {
             if sortType == "dueDay" {
@@ -70,18 +70,17 @@ class SortingPopUpViewController: UIViewController {
             } else {
                 nameSortingButton.setTitleColor(UIColor(hexString: "3CB175"), for: .normal)
             }
-        }
-        else {
+        } else {
             registerSortingButton.setTitleColor(UIColor(hexString: "3CB175"), for: .normal)
         }
-        
+
     }
-    
+
     func setupUI() {
         self.view.translatesAutoresizingMaskIntoConstraints = false
         self.view.backgroundColor = .white
         sheetPresentationController?.preferredCornerRadius = 30
-        
+
         self.view.addSubview(stackView)
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 24),
@@ -91,7 +90,7 @@ class SortingPopUpViewController: UIViewController {
         ])
 
     }
-    
+
     func addTargets() {
         registerSortingButton.addTarget(self, action: #selector(registerSortingButtonTapped), for: .touchUpInside)
         expireSortingButton.addTarget(self, action: #selector(expireSortingButtonTapped), for: .touchUpInside)
@@ -112,11 +111,4 @@ class SortingPopUpViewController: UIViewController {
         delegate?.reloadTableView()
         dismiss(animated: true, completion: {})
     }
-    
-    
-    
-
-
-
-
 }

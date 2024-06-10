@@ -10,7 +10,6 @@ import Foundation
 final class DateHelper {
     let dateFormatter = DateFormatter()
     let todayString: String
-    
     init() {
         dateFormatter.dateFormat = "yyyy.MM.dd"
         self.todayString = dateFormatter.string(from: Date())
@@ -22,7 +21,6 @@ final class DateHelper {
         let calDay = Calendar.current.date(byAdding: .day, value: day, to: Date())
         return dateFormatter.string(from: calDay!)
     }
-    
     func dateToStringFormat(date: Date) -> String {
         return dateFormatter.string(from: date)
     }
@@ -30,5 +28,4 @@ final class DateHelper {
         guard let date = date else { return ""}
         return dateFormatter.string(from: date)
     }
-    
 }

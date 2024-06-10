@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 extension ComponentData {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<ComponentData> {
@@ -28,6 +27,5 @@ extension ComponentData {
 
 }
 
-extension ComponentData : Identifiable {
-
+extension ComponentData: Identifiable {
 }

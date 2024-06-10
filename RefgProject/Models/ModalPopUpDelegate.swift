@@ -8,6 +8,6 @@
 import Foundation
 
 protocol  ModalPopUpDelegate: AnyObject {
-    func  setupSortingType (sortType : String? )
+    func  setupSortingType (sortType: String? )
     func reloadTableView()
 }

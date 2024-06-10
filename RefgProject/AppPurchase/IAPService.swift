@@ -10,11 +10,9 @@ import StoreKit
 
 typealias ProductsRequestCompletion = (_ success: Bool, _ products: [SKProduct]?) -> Void
 
-
-
 protocol IAPServiceType {
   var canMakePayments: Bool { get }
-  
+
   func getProducts(completion: @escaping ProductsRequestCompletion)
   func buyProduct(_ product: SKProduct)
   func isProductPurchased(_ productID: String) -> Bool
@@ -22,17 +20,16 @@ protocol IAPServiceType {
 }
 
 final class IAPService: NSObject, IAPServiceType {
-    
+
     private let productIDs: Set<String>
     private var purchasedProductIDs: Set<String> = []
     private var productsRequest: SKProductsRequest?
     private var productsCompletion: ProductsRequestCompletion?
-    
+
     var canMakePayments: Bool {
         SKPaymentQueue.canMakePayments()
     }
- 
-    
+
     func getProducts(completion: @escaping ProductsRequestCompletion) {
       self.productsRequest?.cancel()
       self.productsCompletion = completion
@@ -40,7 +37,7 @@ final class IAPService: NSObject, IAPServiceType {
       self.productsRequest?.delegate = self
       self.productsRequest?.start()
     }
-    
+
     func buyProduct(_ product: SKProduct) {
       SKPaymentQueue.default().add(SKPayment(product: product))
     }
@@ -50,10 +47,10 @@ final class IAPService: NSObject, IAPServiceType {
     func restorePurchases() {
       SKPaymentQueue.default().restoreCompletedTransactions()
     }
-    
+
     init(productIDs: Set<String>) {
         self.productIDs = productIDs
-        
+
         super.init()
     }
 }
@@ -64,17 +61,17 @@ extension IAPService: SKProductsRequestDelegate {
     let products = response.products
     self.productsCompletion?(true, products)
     self.clearRequestAndHandler()
-    
+
     products.forEach { print("Found product: \($0.productIdentifier) \($0.localizedTitle) \($0.price.floatValue)") }
   }
-  
+
   // failed
   func request(_ request: SKRequest, didFailWithError error: Error) {
     print("Erorr: \(error.localizedDescription)")
     self.productsCompletion?(false, nil)
     self.clearRequestAndHandler()
   }
-  
+
   private func clearRequestAndHandler() {
     self.productsRequest = nil
     self.productsCompletion = nil

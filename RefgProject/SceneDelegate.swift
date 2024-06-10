@@ -16,11 +16,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
 
-        //네비게이션컨트롤러 루트 설정
+        // 네비게이션컨트롤러 루트 설정
         let navigationVC = UINavigationController(rootViewController: ViewController())
-        
+
         self.window?.overrideUserInterfaceStyle = .light
-        
+
         // window에 보여질 루트 뷰를 NavigationController로 설정
        // self.window?.rootViewController = navigationVC
         self.window?.rootViewController = navigationVC
@@ -57,7 +57,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Save changes in the application's managed object context when the application transitions to the background.
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
-
-
 }
-

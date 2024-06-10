@@ -1,0 +1,19 @@
+included:
+  - RefgProject
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - Pods/
+line_length:
+  warning: 120  # 경고를 발생시킬 최대 길이
+  error: 150    # 오류를 발생시킬 최대 길이
+  ignores_function_declarations: true  # 함수 선언은 무시
+  ignores_comments: true               # 주석은 무시
+  ignores_urls: true                   # URL은 무시
+disabled_rules:
+  - function_parameter_count
+  - type_body_length
+  - double_quoted_include
+  - file_length
+  - identifier_name
+  - large_tuple
+  - function_body_length
+
